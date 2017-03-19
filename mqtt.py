@@ -6,29 +6,32 @@
 import paho.mqtt.client as mqtt
 import configparser
 
-topic_names = []
+TOPICS = [
+    'stereo',
+    'lights',
+    'homeApp'
+]
 
 
-def on_connect(mqttc, obj, rc):
-    print("rc: "+str(rc))
+def on_message(client, userdata, msg, ):
+    print("{} Payload -> {}"
+        .format(
+            msg.topic,
+            msg.payload.decode()
+        ))
+
+    client.publish('output', msg.payload.decode())
 
 
-def on_message(mqtt, obj, msg, ):
-    # print(msg.topic + " " + str(msg.payload))
-    payload = str(msg.payload.decode())
-    print(msg.topic + " Payload -> " + payload)
-    topic_names.append(msg.topic)
+def on_publish(client, userdata, messageId):
+    print("MessageID: "+str(messageId))
 
 
-def on_publish(mqttc, obj, mid):
-    print("mid: "+str(mid))
+def on_subscribe(client, userdata, messageId, granted_qos):
+    print("Subscribed: "+str(messageId)+" "+str(granted_qos))
 
 
-def on_subscribe(mqttc, obj, mid, granted_qos):
-    print("Subscribed: "+str(mid)+" "+str(granted_qos))
-
-
-def on_log(mqttc, obj, level, string):
+def on_log(client, userdata, level, string):
     print(string)
 
 
@@ -39,17 +42,19 @@ if __name__ == "__main__":
     client = mqtt.Client()
     client.username_pw_set(cfg['DEFAULT']['user'], cfg['DEFAULT']['pass'])
     client.on_message = on_message
+    client.on_publish = on_publish
+    client.on_subscribe = on_subscribe
 
     try:
         client.connect(cfg['DEFAULT']['url'], int(cfg['DEFAULT']['port']), 60)
-        client.subscribe("stereo", 0)
-        client.subscribe("lights", 0)
+
+        for topic in TOPICS:
+            client.subscribe(topic, 0)
+
         client.loop_forever()
 
     except KeyboardInterrupt:
-        print("Received topics:")
-        for topic in topic_names:
-            print(topic)
+        print("\nMQTT Ended")
 
     finally:
         client.disconnect()
