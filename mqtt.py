@@ -8,7 +8,7 @@ import json
 
 def on_message(client, userdata, msg, ):
     print("{} Payload -> {}".format(msg.topic, msg.payload.decode()))
-    client.publish('output', msg.payload.decode())
+    # client.publish('output', msg.payload.decode())
 
 
 def on_publish(client, userdata, messageId):
