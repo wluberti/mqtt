@@ -3,23 +3,11 @@
 
 """ Main script for connecting to a MQTT queue """
 
-import paho.mqtt.client as mqtt
-import configparser
-
-TOPICS = [
-    'stereo',
-    'lights',
-    'homeApp'
-]
-
+import paho.mqtt.client
+import json
 
 def on_message(client, userdata, msg, ):
-    print("{} Payload -> {}"
-        .format(
-            msg.topic,
-            msg.payload.decode()
-        ))
-
+    print("{} Payload -> {}".format(msg.topic, msg.payload.decode()))
     client.publish('output', msg.payload.decode())
 
 
@@ -36,19 +24,22 @@ def on_log(client, userdata, level, string):
 
 
 if __name__ == "__main__":
-    cfg = configparser.ConfigParser()
-    cfg.read('config.ini')
 
-    client = mqtt.Client()
-    client.username_pw_set(cfg['DEFAULT']['user'], cfg['DEFAULT']['pass'])
+    # read config file
+    with open('config.json', 'r') as filePointer:
+        cfg = json.load(filePointer)
+
+    client = paho.mqtt.client.Client()
+    client.username_pw_set(cfg['mqtt']['user'], cfg['mqtt']['pass'])
     client.on_message = on_message
     client.on_publish = on_publish
     client.on_subscribe = on_subscribe
 
     try:
-        client.connect(cfg['DEFAULT']['url'], int(cfg['DEFAULT']['port']), 60)
+        client.connect(cfg['mqtt']['url'], int(cfg['mqtt']['port']), 60)
 
-        for topic in TOPICS:
+        for topic in cfg['topics'].values():
+            print(topic)
             client.subscribe(topic, 0)
 
         client.loop_forever()

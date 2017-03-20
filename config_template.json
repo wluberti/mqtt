@@ -1,0 +1,14 @@
+{
+  "mqtt": {
+    "url": "YOURMQTT.DOMAIN.TLD",
+    "port": 1883,
+    "user": "YOUR_USERNAME_FOR_MQTT",
+    "pass": "YOUR_PASSWORD_FOR_MQTT"
+  },
+  
+  "topics": {
+    "SKILL_NAME1": "amzn1.ask.skill.YOUR_SKILL_ID_FOR_SKILL_NAME1",
+    "SKILL_NAME2": "amzn1.ask.skill.YOUR_SKILL_ID_FOR_SKILL_NAME2",
+    "SKILL_NAME3": "amzn1.ask.skill.YOUR_SKILL_ID_FOR_SKILL_NAME3"
+  }
+}
